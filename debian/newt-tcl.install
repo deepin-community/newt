@@ -1,1 +1,1 @@
-whiptcl.so usr/lib/whiptcl
+usr/lib/*/whiptcl.so usr/lib/whiptcl

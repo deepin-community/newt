@@ -6,11 +6,9 @@ Description: Fix unreal exit code in manpage.
 Last-Updated: 2018-03-20
 Forwarded: no
 
-Index: newt-0.52.20/whiptail.1
-===================================================================
---- newt-0.52.20.orig/whiptail.1
-+++ newt-0.52.20/whiptail.1
-@@ -64,11 +64,11 @@ whiptail \- display dialog boxes from sh
+--- a/whiptail.1
++++ b/whiptail.1
+@@ -64,11 +64,11 @@
  .B whiptail
  is a program that will let you present a variety of questions or
  display messages using dialog boxes from a shell script. Currently,
@@ -24,7 +22,7 @@ Index: newt-0.52.20/whiptail.1
  .BR password " box."
  .SH OPTIONS
  .TP
-@@ -80,7 +80,7 @@ switching is enabled, because in that ca
+@@ -80,7 +80,7 @@
  an alternate screen.
  .TP
  .B \-\-defaultno
@@ -33,7 +31,7 @@ Index: newt-0.52.20/whiptail.1
  .BR No " button."
  .TP
  .BI \-\-default\-item " string"
-@@ -88,12 +88,12 @@ Set  the default item in a menu box.
+@@ -88,12 +88,12 @@
  Normally the first item in the box is the default.
  .TP
  \fB\-\-fb\fR, \fB\-\-fullbuttons\fR
@@ -48,7 +46,7 @@ Index: newt-0.52.20/whiptail.1
  .BR Cancel " button".
  .TP
  .BI \-\-yes\-button " text"
-@@ -120,12 +120,12 @@ but checklist and radiolist expect only
+@@ -120,12 +120,12 @@
  .B \-\-notags
  Don't display tags in the menu, checklist and radiolist widgets.
  .TP
@@ -64,7 +62,7 @@ Index: newt-0.52.20/whiptail.1
  .B whiptail
  scripts
  write to standard error, but  error  messages  may  also  be
-@@ -141,10 +141,10 @@ Specifies a
+@@ -141,10 +141,10 @@
  .I backtitle
  string to be displayed on the backdrop, at the top of the screen.
  .TP
@@ -77,7 +75,7 @@ Index: newt-0.52.20/whiptail.1
  Put window in top-left corner.
  .TP
  \fB\-h\fR, \fB\-\-help\fR
-@@ -263,7 +263,7 @@ of the chosen menu entry will be printed
+@@ -263,7 +263,7 @@
  .IP "\fB\-\-checklist \fItext height width list-height \fR[ \fItag item status \fR] \fI..."
  .RB "A " checklist " box is similar to a " menu " box in that there are"
  multiple entries presented in the form of a menu.
@@ -86,7 +84,7 @@ Index: newt-0.52.20/whiptail.1
  The initial on/off state of each entry is specified by
  .IR status "."
  On exit, a list of the
-@@ -286,7 +286,7 @@ The gauge exits when EOF is reached on s
+@@ -286,7 +286,7 @@
  
  .SH NOTES
  whiptail interprets arguments starting with a dash "\-" as being arguments.
@@ -95,7 +93,7 @@ Index: newt-0.52.20/whiptail.1
  dash, whiptail honours the getopt convention of accepting the special
  argument "\-\-" which means that all following arguments with dashes are to
  be treated verbatim and not parsed as options.
-@@ -301,7 +301,7 @@ or
+@@ -306,7 +306,7 @@
  .B whiptail
  is exited by pressing the
  .I ESC
