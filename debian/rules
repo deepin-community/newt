@@ -45,7 +45,7 @@ override_dh_auto_configure:
 	# Nasty hack. why is it necessary?
 	cp /usr/share/automake-$(AM_VERS)/install-sh ./install-sh
 	dh_auto_configure  -- $(GPMSUPPORT) $(NOSTRIP) $(COLORSFILE) CFLAGS='-I/usr/include/tcl8.6 $(CFLAGS) -DMARCH=\"$(DEB_HOST_MULTIARCH)\" '  \
-		CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" FFLAGS="$(FFLAGS)" 
+		CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" FFLAGS="$(FFLAGS)"  WHIPTCLLIB=whiptcl
 
 override_dh_auto_build:
 	dh_auto_build
@@ -67,7 +67,7 @@ ifeq ($(filter nopython,$(DEB_BUILD_PROFILES)),)
               fi; \
                cp snack.py $$v/* debian/python3-newt/$$pylib; \
         done
-	-find debian/python-* debian/python3-* -name '*.o' | xargs rm -f
+	-find debian/python3-* -name '*.o' | xargs rm -f
 endif
 	mkdir -p debian/libnewt-pic/$(LIBDIR)
 	cp newt*.ver debian/libnewt-pic/$(LIBDIR)/libnewt_pic.map

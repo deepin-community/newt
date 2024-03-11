@@ -1,0 +1,17 @@
+Author: Alastair McKinstry <mckinstry@debian.org>
+Description: Ensure Make fails if extension build fails
+Bug-Origin: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1060660
+Last-Updated: 2024-01-15
+Forwarded: not-needed
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -95,7 +95,7 @@
+ 		$(CC) $(SHCFLAGS) $(CPPFLAGS) $(CFLAGS) $$PIFLAGS $$PCFLAGS -fPIC -c -o $$ver/snack.o snack.c; \
+ 		echo $(CC) --shared -fPIC $$PLDFLAGS $$PLFLAGS $(LDFLAGS) -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L.  -lnewt $(LIBS); \
+ 		$(CC) --shared -fPIC $$PLDFLAGS $$PLFLAGS $(LDFLAGS) -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L.  -lnewt $(LIBS); \
+-	done || :
++	done
+ 	touch $@
+ 
+ whiptail: $(NDIALOGOBJS) $(LIBNEWTSH)
