@@ -2,9 +2,9 @@ Source: newt
 Section: devel
 Priority: optional
 Maintainer: Alastair McKinstry <mckinstry@debian.org>
-Vcs-Browser: https://salsa.debian.org:/mckinstry/newt.git
-Vcs-Git: https://salsa.debian.org:/mckinstry/newt.git -b debian/latest
-Standards-Version: 4.6.0
+Vcs-Browser: https://salsa.debian.org/mckinstry/newt.git
+Vcs-Git: https://salsa.debian.org/mckinstry/newt.git -b debian/latest
+Standards-Version: 4.7.0
 Homepage: https://pagure.io/newt
 Build-Depends: debhelper-compat (= 13),
  docbook-utils,
@@ -49,6 +49,7 @@ Description: Not Erik's Windowing Toolkit for Debian Installer
  You only need this package to support applications needing Newt during
  the Debian installation process time and probably don't need to select it.
 Package-Type: udeb
+Build-Profiles: <!noudeb>
 
 Package: newt-tcl
 Architecture: any
@@ -62,7 +63,6 @@ Package: python3-newt
 Architecture: any
 Multi-Arch: same
 Section: python
-Provides: ${python3:Provides}
 Depends: libnewt0.52 (=${binary:Version}) , ${python3:Depends}, ${misc:Depends}, ${shlibs:Depends}
 Build-Profiles: <!nopython>
 Description: NEWT module for Python3

@@ -6,10 +6,10 @@ Description: Fix unreal exit code in manpage.
 Last-Updated: 2018-03-20
 Forwarded: no
 
-Index: newt-0.52.20/whiptail.1
+Index: newt-0.52.25/whiptail.1
 ===================================================================
---- newt-0.52.20.orig/whiptail.1
-+++ newt-0.52.20/whiptail.1
+--- newt-0.52.25.orig/whiptail.1
++++ newt-0.52.25/whiptail.1
 @@ -64,11 +64,11 @@ whiptail \- display dialog boxes from sh
  .B whiptail
  is a program that will let you present a variety of questions or
@@ -95,7 +95,7 @@ Index: newt-0.52.20/whiptail.1
  dash, whiptail honours the getopt convention of accepting the special
  argument "\-\-" which means that all following arguments with dashes are to
  be treated verbatim and not parsed as options.
-@@ -301,7 +301,7 @@ or
+@@ -306,7 +306,7 @@ or
  .B whiptail
  is exited by pressing the
  .I ESC

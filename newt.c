@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 #include <wchar.h>
 
@@ -134,11 +135,6 @@ static const struct keymap keymap[] = {
 };
 static void initKeymap();
 static void freeKeymap();
-
-static const char ident[] = // ident friendly
-    "$Version: Newt windowing library v" VERSION " $"
-    "$Copyright: (C) 1996-2003 Red Hat, Inc. Written by Erik Troan $"
-    "$License: Lesser GNU Public License. $";
 
 static newtSuspendCallback suspendCallback = NULL;
 static void * suspendCallbackData = NULL;
@@ -399,8 +395,6 @@ int newtInit(void) {
        avoid character corruption by redrawing the screen */
     if (strstr (lang, ".euc") != NULL)
 	trashScreen = 1;
-
-    (void) strlen(ident);
 
     SLutf8_enable(-1);
     SLtt_get_terminfo();
@@ -873,8 +867,6 @@ void newtPopWindowNoRefresh(void) {
     if (currentWindow == NULL)
 	return;
 
-    row = col = 0;
-
     row = currentWindow->top - 1;
     col = currentWindow->left - 2;
     if (row < 0)
@@ -1033,7 +1025,9 @@ static void freeKeymap() {
  * @param int - number of usecs to wait for.
  */
 void newtDelay(unsigned int usecs) {
-    usleep(usecs);
+    struct timespec t = { usecs / 1000000, (usecs % 1000000) * 1000 };
+
+    nanosleep(&t, NULL);
 }
 
 struct eventResult newtDefaultEventHandler(newtComponent c,

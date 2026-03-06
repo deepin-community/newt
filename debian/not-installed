@@ -1,2 +1,3 @@
 # Installed with changes see d/rules
 usr/lib/*/python*
+usr/local/lib/python3*

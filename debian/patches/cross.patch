@@ -1,0 +1,32 @@
+Description: Patch for cross-compilation
+Author: Helmut Grohne
+Bug-Origin: https://bugs.debian.org/cgi-bin/bugreport.cgi?att=1;bug=1061246;filename=cross.patch;msg=5
+Last-Updated: 2024-11-13
+Forwarded: not-needed
+
+Index: newt-0.52.25/configure.ac
+===================================================================
+--- newt-0.52.25.orig/configure.ac
++++ newt-0.52.25/configure.ac
+@@ -78,6 +78,8 @@ else
+ fi
+ AC_SUBST([PYTHONVERS])
+ 
++AC_SUBST([ac_tool_prefix])
++
+ AC_ARG_WITH([tcl], [  --without-tcl           do not compile whiptcl.so])
+ if test "x$with_tcl" = "xno"; then
+   WHIPTCLLIB=
+Index: newt-0.52.25/Makefile.in
+===================================================================
+--- newt-0.52.25.orig/Makefile.in
++++ newt-0.52.25/Makefile.in
+@@ -92,7 +92,7 @@ showkey:	showkey.o $(LIBNEWT)
+ _snack.$(SOEXT):   snack.c $(LIBNEWTSH)
+ ifneq ($(PYTHONVERS),)
+ 	@for ver in $(PYTHONVERS) $(PYTHONDBG) ; do \
+-		pyconfig=$$ver-config; \
++		pyconfig=`command -v $(ac_tool_prefix)$$ver-config || echo $$ver-config`; \
+ 		if ! $$pyconfig --cflags > /dev/null 2>&1 && \
+ 				python-config --cflags > /dev/null 2>&1; then \
+ 			echo $$pyconfig not found, using python-config; \

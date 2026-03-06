@@ -1,0 +1,26 @@
+Description: Rename example files for python3
+Author: Alastair McKinstry <mckinstry@debian.org>
+Bug-Origin: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=983468
+Last-Updated: 2024-11-03
+Forwarded: not-needed
+
+Index: newt-0.52.24/peanuts.py
+===================================================================
+--- newt-0.52.24.orig/peanuts.py
++++ newt-0.52.24/peanuts.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ # Demo program to show use of python-newt module
+ 
+Index: newt-0.52.24/popcorn.py
+===================================================================
+--- newt-0.52.24.orig/popcorn.py
++++ newt-0.52.24/popcorn.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ from __future__ import absolute_import, print_function, unicode_literals
+ from snack import *

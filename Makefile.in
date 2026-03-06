@@ -83,7 +83,8 @@ showkey:	showkey.o $(LIBNEWT)
 	$(CC) -g -o showkey showkey.o $(LIBNEWT) $(LDFLAGS) $(LIBS)
 
 _snack.$(SOEXT):   snack.c $(LIBNEWTSH)
-	@[ -n "$(PYTHONVERS)" ] && for ver in $(PYTHONVERS); do \
+ifneq ($(PYTHONVERS),)
+	@for ver in $(PYTHONVERS); do \
 		pyconfig=$$ver-config; \
 		if ! $$pyconfig --cflags > /dev/null 2>&1 && \
 				python-config --cflags > /dev/null 2>&1; then \
@@ -92,14 +93,13 @@ _snack.$(SOEXT):   snack.c $(LIBNEWTSH)
 		fi; \
 		mkdir -p $$ver; \
 		PCFLAGS=`$$pyconfig --cflags`; \
-		PIFLAGS=`$$pyconfig --includes`; \
-		PLDFLAGS=`$$pyconfig --ldflags`; \
-		PLFLAGS=`$$pyconfig --libs`; \
-		echo $(CC) $(SHCFLAGS) $(CPPFLAGS) $$PIFLAGS $$PCFLAGS -c -o $$ver/snack.o snack.c; \
-		$(CC) $(SHCFLAGS) $(CPPFLAGS) $$PIFLAGS $$PCFLAGS -c -o $$ver/snack.o snack.c; \
-		echo $(CC) --shared $$PLDFLAGS $$PLFLAGS $(LDFLAGS) -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L.  -lnewt $(LIBS); \
-		$(CC) --shared $$PLDFLAGS $$PLFLAGS $(LDFLAGS) -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L.  -lnewt $(LIBS); \
-	done || :
+		PLDFLAGS=`$$pyconfig --ldflags --embed || $$pyconfig --ldflags`; \
+		echo $(CC) $(SHCFLAGS) $(CFLAGS) $(CPPFLAGS) $$PCFLAGS -c -o $$ver/snack.o snack.c; \
+		$(CC) $(SHCFLAGS) $(CFLAGS) $(CPPFLAGS) $$PCFLAGS -c -o $$ver/snack.o snack.c; \
+		echo $(CC) --shared $(LDFLAGS) $$PLDFLAGS -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L. -lnewt $(LIBS); \
+		$(CC) --shared $(LDFLAGS) $$PLDFLAGS -o $$ver/_snack.$(SOEXT) $$ver/snack.o -L. -lnewt $(LIBS); \
+	done
+endif
 	touch $@
 
 whiptail: $(NDIALOGOBJS) $(LIBNEWTSH)
@@ -137,27 +137,39 @@ $(SHAREDDIR)/%.o : %.c
 install: $(LIBNEWT) install-sh whiptail
 	[ -d $(instroot)/$(bindir) ] || install -m 755 -d $(instroot)/$(bindir)
 	[ -d $(instroot)/$(libdir) ] || install -m 755 -d $(instroot)/$(libdir)
-	[ -d $(instroot)/$(includedir) ] || install -m 755 -d $(instroot)/$(includedir)
 	[ -d $(instroot)/$(man1dir) ] || install -m 755 -d $(instroot)/$(man1dir)
-	[ -d $(instroot)/$(pkgconfigdir) ] || install -m 755 -d $(instroot)/$(pkgconfigdir)
-	install -m 644 newt.h $(instroot)/$(includedir)
 	install -m 644 $(LIBNEWT) $(instroot)/$(libdir)
 	install -m 755 whiptail $(instroot)/$(bindir)
 	install -m 644 whiptail.1 $(instroot)/$(man1dir)
 	make -C po datadir=$(instroot)/$(datadir) install
-	install -m 644 libnewt.pc $(instroot)/$(pkgconfigdir)
 
-install-sh: sharedlib $(WHIPTCLSO) _snack.$(SOEXT)
+install-sh: sharedlib install-tcl install-py
 	[ -d $(instroot)/$(libdir) ] || install -m 755 -d $(instroot)/$(libdir)
+	[ -d $(instroot)/$(includedir) ] || install -m 755 -d $(instroot)/$(includedir)
+	[ -d $(instroot)/$(pkgconfigdir) ] || install -m 755 -d $(instroot)/$(pkgconfigdir)
+	install -m 644 newt.h $(instroot)/$(includedir)
 	install -m 755 $(LIBNEWTSH) $(instroot)/$(libdir)
 	ln -sf $(LIBNEWTSONAME) $(instroot)/$(libdir)/libnewt.$(SOEXT)
 	ln -sf $(LIBNEWTSH) $(instroot)/$(libdir)/$(LIBNEWTSONAME)
-	[ -n "$(WHIPTCLSO)" ] && install -m 755 whiptcl.$(SOEXT) $(instroot)/$(libdir) || :
-	[ -n "$(PYTHONVERS)" ] && for ver in $(PYTHONVERS) ; do \
-	   [ -d $(instroot)/$(libdir)/$$ver/site-packages ] || install -m 755 -d $(instroot)/$(libdir)/$$ver/site-packages ;\
-	   install -m 755 $$ver/_snack.$(SOEXT) $(instroot)/$(libdir)/$$ver/site-packages ;\
-	   install -m 644 snack.py $(instroot)/$(libdir)/$$ver/site-packages ;\
-	done || :
+	install -m 644 libnewt.pc $(instroot)/$(pkgconfigdir)
+
+install-tcl: $(WHIPTCLSO)
+ifneq ($(WHIPTCLSO),)
+	[ -d $(instroot)/$(libdir) ] || install -m 755 -d $(instroot)/$(libdir)
+	install -m 755 $(WHIPTCLSO) $(instroot)/$(libdir)
+endif
+
+install-py: _snack.$(SOEXT)
+ifneq ($(PYTHONVERS),)
+	@for ver in $(PYTHONVERS); do \
+		PLATLIB=`$$ver -c "import sysconfig; print(sysconfig.get_path('platlib'))"`; \
+		[ -d $(instroot)/$$PLATLIB ] || install -m 755 -d $(instroot)/$$PLATLIB ;\
+		echo install -m 755 $$ver/_snack.$(SOEXT) $(instroot)/$$PLATLIB;\
+		install -m 755 $$ver/_snack.$(SOEXT) $(instroot)/$$PLATLIB;\
+		echo install -m 644 snack.py $(instroot)/$$PLATLIB;\
+		install -m 644 snack.py $(instroot)/$$PLATLIB;\
+	done
+endif
 
 Makefile: configure.ac
 	@echo "You need to rerun ./autogen.sh and ./configure before continuing"

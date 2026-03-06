@@ -1,0 +1,45 @@
+Author: Helmut Grohne <helmut@subdivi.de>
+Description: Fix nopython build profile.
+Bug-Origin: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1082963
+Last-Changed: 2024-11-03
+Forwarded: not-needed
+
+Index: newt-0.52.25/Makefile.in
+===================================================================
+--- newt-0.52.25.orig/Makefile.in
++++ newt-0.52.25/Makefile.in
+@@ -14,6 +14,13 @@ SONAME = @SONAME@
+ SOEXT = so
+ 
+ PYTHONVERS = @PYTHONVERS@
++PYTHONDBG := $(addsuffix -dbg, $(PYTHONVERS))
++ifeq ($(PYTHONVERS),)
++SNACKSO =
++else
++SNACKSO = _snack.$(SOEXT)
++endif
++
+ WHIPTCLLIB = @WHIPTCLLIB@
+ ifneq ($(WHIPTCLLIB),)
+ WHIPTCLSO = $(WHIPTCLLIB).$(SOEXT)
+@@ -65,7 +72,7 @@ else
+ TARGET=depend $(PROGS)
+ endif
+ 
+-all:	$(TARGET) _snack.$(SOEXT) whiptcl.$(SOEXT)
++all:	$(TARGET) $(SNACKSO) $(WHIPTCLSO)
+ 
+ test:	test.o $(LIBNEWT)
+ 	$(CC) -g -o test test.o $(LIBNEWT) $(LDFLAGS) $(LIBS)
+@@ -105,8 +112,10 @@ endif
+ whiptail: $(NDIALOGOBJS) $(LIBNEWTSH)
+ 	$(CC) -g -o whiptail $(NDIALOGOBJS) -L. $(LDFLAGS) -lnewt $(LIBS) -lpopt
+ 
+-whiptcl.$(SOEXT): $(WHIPTCLOBJS) $(LIBNEWTSH)
++ifneq ($(WHIPTCLSO),)
++$(WHIPTCLSO): $(WHIPTCLOBJS) $(LIBNEWTSH)
+ 	$(CC) -shared $(SHCFLAGS) $(LDFLAGS) -o whiptcl.$(SOEXT) $(WHIPTCLOBJS) -L. -lnewt  $(LIBTCL) -lpopt $(LIBS)
++endif
+ 
+ $(LIBNEWT): $(LIBOBJS)
+ 	ar rv $@ $^

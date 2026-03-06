@@ -199,32 +199,37 @@ static void spaceForButtons(int * height, int * width, int count, int full) {
     }
 }
 
-static int menuSize(int * height, int * width, enum mode mode,
-		    poptContext options) {
+static int menuSize(int * height, int * width, int * listHeight,
+                    enum mode mode, int * flags, poptContext options) {
     const char ** argv = poptGetArgs(options);
-    const char ** items = argv;
     int         h = 0;
     int         tagWidth = 0;
     int         descriptionWidth = 0;
     int         overhead = 10;
-    static char buf[20];
 
     if ( argv == 0 || *argv == 0 )
        return 0;
 
-    argv++;
     if ( mode == MODE_MENU )
        overhead = 5;
 
     while ( argv[0] != 0 && argv[1] ) {
-       tagWidth = max(tagWidth, strlen(argv[0]));
-       descriptionWidth = max(descriptionWidth, strlen(argv[1]));
+       tagWidth = max(tagWidth, _newt_wstrlen(argv[0], -1));
+       descriptionWidth = max(descriptionWidth, _newt_wstrlen(argv[1], -1));
 
-       if ( mode == MODE_MENU )
+       if (mode == MODE_MENU || *flags & FLAG_NOITEM)
            argv += 2;
        else
           argv += 3;
        h++;
+    }
+
+    if (*flags & FLAG_NOTAGS) {
+	tagWidth = 0;
+	overhead -= mode == MODE_MENU ? 1 : 2;
+    }
+    if (*flags & FLAG_NOITEM) {
+	descriptionWidth = 0;
     }
 
     *width = max(*width, tagWidth + descriptionWidth + overhead);
@@ -232,16 +237,15 @@ static int menuSize(int * height, int * width, enum mode mode,
 
     h = min(h, SLtt_Screen_Rows - *height - 4);
     *height = *height + h + 1;
-    sprintf(buf, "%d", h);
-   *items = buf;
+    *listHeight = h;
     return 0;
 }
 
 /*
  * Guess the size of a window, given what will be displayed within it.
  */
-static void guessSize(int * height, int * width, enum mode mode,
-                     int * flags, int fullButtons,
+static void guessSize(int * height, int * width, int * listHeight,
+                     enum mode mode, int * flags, int fullButtons,
                      const char * title, const char * text,
                      poptContext options) {
 
@@ -259,9 +263,11 @@ static void guessSize(int * height, int * width, enum mode mode,
        case MODE_MENU:
            spaceForButtons(&h, &w, *flags & FLAG_NOCANCEL ? 1 : 2,
             fullButtons);
-           menuSize(&h, &w, mode, options);
+           menuSize(&h, &w, listHeight, mode, flags, options);
                break;
        case MODE_YESNO:
+           spaceForButtons(&h, &w, 2, fullButtons);
+           break;
        case MODE_MSGBOX:
            spaceForButtons(&h, &w, 1, fullButtons);
            break;
@@ -332,6 +338,7 @@ int main(int argc, const char ** argv) {
     char * end;
     int height;
     int width;
+    int listHeight = 1;
     int fd = -1;
     int needSpace = 0;
     int noCancel = 0;
@@ -346,7 +353,7 @@ int main(int argc, const char ** argv) {
     int fullButtons = 0;
     int outputfd = 2;
     int topLeft = 0;
-    FILE *output = stderr;
+    FILE *output;
     char * result;
     char ** selections, ** next;
     char * title = NULL;
@@ -499,7 +506,16 @@ int main(int argc, const char ** argv) {
     width = strtoul(nextArg, &end, 10);
     if (*end) usage(WAS_ERROR);
 
-    if (mode == MODE_GAUGE) {
+    switch (mode) {
+      case MODE_MENU:
+      case MODE_RADIOLIST:
+      case MODE_CHECKLIST:
+	if (!(nextArg = poptGetArg(optCon))) usage(WAS_ERROR);
+	listHeight = strtoul(nextArg, &end, 10);
+	if (*end) usage(WAS_ERROR);
+	break;
+
+      case MODE_GAUGE:
 	fd = dup(0);
 	if (fd < 0 || close(0) < 0) {
 	    perror("dup/close stdin");
@@ -509,16 +525,32 @@ int main(int argc, const char ** argv) {
 	    perror("open /dev/tty");
 	    exit(DLG_ERROR);
 	}
+	break;
+      default:
+	break;
     }
+
+    if (noCancel) flags |= FLAG_NOCANCEL;
+    if (noItem) flags |= FLAG_NOITEM;
+    if (noTags) flags |= FLAG_NOTAGS;
+    if (scrollText) flags |= FLAG_SCROLL_TEXT;
+    if (defaultNo) flags |= FLAG_DEFAULT_NO;
 
     newtInit();
     newtCls();
 
     cleanNewlines(text);
 
-    if ( height <= 0 || width <= 0 )
-       guessSize(&height, &width, mode, &flags, fullButtons, title, text,
-                 optCon);
+    if (height <= 0 || width <= 0 || listHeight <= 0) {
+	guessSize(&height, &width, &listHeight, mode, &flags, fullButtons,
+		 title, text, optCon);
+	if (!topLeft && backtitle && SLtt_Screen_Rows > 10 &&
+	    height + 1 == SLtt_Screen_Rows &&
+	    _newt_wstrlen(backtitle, -1) > (SLtt_Screen_Cols - width) / 2) {
+	    height -= 1;
+	    listHeight -= 1;
+	}
+    }
 
     width -= 2;
     height -= 2;
@@ -536,12 +568,6 @@ int main(int argc, const char ** argv) {
 	setButtonText(yes_button, BUTTON_YES);
     if (no_button)
 	setButtonText(no_button, BUTTON_NO);
-
-    if (noCancel) flags |= FLAG_NOCANCEL;
-    if (noItem) flags |= FLAG_NOITEM;
-    if (noTags) flags |= FLAG_NOTAGS;
-    if (scrollText) flags |= FLAG_SCROLL_TEXT;
-    if (defaultNo) flags |= FLAG_DEFAULT_NO;
 
     switch (mode) {
       case MODE_MSGBOX:
@@ -575,7 +601,7 @@ int main(int argc, const char ** argv) {
 	break;
 
       case MODE_MENU:
-	rc = listBox(text, height, width, optCon, flags, default_item, &result);
+	rc = listBox(text, height, width, listHeight, optCon, flags, default_item, &result);
 	if (rc == DLG_OKAY) {
 	    fprintf(output, "%s", result);
 	    free(result);
@@ -583,7 +609,7 @@ int main(int argc, const char ** argv) {
 	break;
 
       case MODE_RADIOLIST:
-	rc = checkList(text, height, width, optCon, 1, flags, &selections);
+	rc = checkList(text, height, width, listHeight, optCon, 1, flags, &selections);
 	if (rc == DLG_OKAY && selections[0]) {
 	    fprintf(output, "%s", selections[0]);
 	    free(selections[0]);
@@ -592,7 +618,7 @@ int main(int argc, const char ** argv) {
 	break;
 
       case MODE_CHECKLIST:
-	rc = checkList(text, height, width, optCon, 0, flags, &selections);
+	rc = checkList(text, height, width, listHeight, optCon, 0, flags, &selections);
 
 	if (!rc) {
 	    for (next = selections; *next; next++) {
