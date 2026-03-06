@@ -1,5 +1,4 @@
 endianness.patch
-python.patch
 tcl86.patch
 icelandic.patch
 python_memory_allocation.patch
@@ -15,3 +14,7 @@ messagebox_escape.patch
 compiler-warnings.patch
 snack.patch
 whiptail-man.patch
+nopython.patch
+rename-python3.patch
+fix-bidi-i386.patch
+cross.patch

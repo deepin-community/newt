@@ -3,11 +3,11 @@ Description: For tcl, build and ship whiptcl.so
 Forwarded: no
 Last-Updated: 2014-06-11
 
-Index: newt-0.52.17/Makefile.in
+Index: newt-0.52.24/Makefile.in
 ===================================================================
---- newt-0.52.17.orig/Makefile.in
-+++ newt-0.52.17/Makefile.in
-@@ -65,7 +65,7 @@ else
+--- newt-0.52.24.orig/Makefile.in
++++ newt-0.52.24/Makefile.in
+@@ -68,7 +68,7 @@ else
  TARGET=depend $(PROGS)
  endif
  

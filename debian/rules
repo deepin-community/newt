@@ -16,23 +16,28 @@
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 LIBDIR:=/usr/lib/$(DEB_HOST_MULTIARCH)
 DEB_HOST_ARCH_OS  ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ifeq ($(filter nopython,$(DEB_BUILD_PROFILES)),)
 PY3VERS:=$(shell py3versions --supported)
+else
+PYTHONSUPPORT= --without-python
+endif
 
 AM_VERS:=$(strip $(shell dpkg-query -f '$${source:Upstream-Version}' -W automake | egrep -o '^[0-9]+\.[0-9]+'))
 
-ifeq ($(DEB_HOST_ARCH_OS),hurd)
-GPMSUPPORT=
-else
+ifneq ($(DEB_HOST_ARCH_OS),hurd)
 GPMSUPPORT= --with-gpm-support
+CONFIGURE_ARGS += --with-gpm-support
 endif
 
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-NOSTRIP=--with-nostrip=no
+CONFIGURE_ARGS += --with-nostrip=$(if $(filter notsrip,$(DEB_BUILD_OPTIONS)),yes,no)
+
+ifeq ($(filter nopython,$(DEB_BUILD_PROFILES)),)
+CONFIGURE_ARGS += "--with-python=`py3versions --supported`"
 else
 NOSTRIP=--with-nostrip=yes
+CONFIGURE_ARGS += --without-python
 endif
 
-COLORSFILE = --with-colorsfile=/etc/newt/palette
 
 override_dh_auto_clean:
 	dh_auto_clean
@@ -44,8 +49,9 @@ override_dh_auto_clean:
 override_dh_auto_configure:
 	# Nasty hack. why is it necessary?
 	cp /usr/share/automake-$(AM_VERS)/install-sh ./install-sh
-	dh_auto_configure  -- $(GPMSUPPORT) $(NOSTRIP) $(COLORSFILE) CFLAGS='-I/usr/include/tcl8.6 $(CFLAGS) -DMARCH=\"$(DEB_HOST_MULTIARCH)\" '  \
-		CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" FFLAGS="$(FFLAGS)" 
+	dh_auto_configure  -- $(CONFIGURE_ARGS) CFLAGS='-I/usr/include/tcl8.6 $(CFLAGS) -DMARCH=\"$(DEB_HOST_MULTIARCH)\" '  \
+		$(PYTHONSUPPORT) \
+		CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" FFLAGS="$(FFLAGS)"  WHIPTCLLIB=whiptcl
 
 override_dh_auto_build:
 	dh_auto_build
@@ -67,7 +73,7 @@ ifeq ($(filter nopython,$(DEB_BUILD_PROFILES)),)
               fi; \
                cp snack.py $$v/* debian/python3-newt/$$pylib; \
         done
-	-find debian/python-* debian/python3-* -name '*.o' | xargs rm -f
+	-find debian/python3-* -name '*.o' | xargs rm -f
 endif
 	mkdir -p debian/libnewt-pic/$(LIBDIR)
 	cp newt*.ver debian/libnewt-pic/$(LIBDIR)/libnewt_pic.map

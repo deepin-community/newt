@@ -1,0 +1,35 @@
+Description: Fix build on i386 by typecasting input stream to FriBidiChar *
+* d/pacthes/fix-bidi-i386.patch, d/patches/series: On i386, the build for newt
+fails due to an incompatible pointer type in wchar_to_textmod_visual while calling
+fribidi_log2vis (-Werror is enabled). This change typecasts the argument to pass
+it. (LP: #2083549)
+Author: Pragyansh Chaturvedi <pragyansh.chaturvedi@canonical.com>
+Origin: Vendor
+Forwarded: no
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/newt/+bug/2083549
+Last-Update: 2024-11-03
+
+Updated with assertion: See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1086133
+
+Index: newt-0.52.24/newt.c
+===================================================================
+--- newt-0.52.24.orig/newt.c
++++ newt-0.52.24/newt.c
+@@ -259,6 +259,8 @@ static wchar_t* wchar_to_textmod_visual(
+     static void *handle = NULL;
+     static int skip_out = 0;
+ 
++    typedef char static_assertion_wchar_size[(sizeof(wchar_t) == sizeof(FriBidiChar))?1:-1];
++
+     fribidi_boolean (*func_ptr) (FriBidiChar *, FriBidiStrIndex,
+                                  FriBidiCharType *, FriBidiChar *,
+                                  FriBidiStrIndex *, FriBidiStrIndex *,
+@@ -301,7 +303,7 @@ static wchar_t* wchar_to_textmod_visual(
+         do_shaping(in, len);
+ 	len = wcsnlen(in, len);
+     }
+-    (*func_ptr)(in, len, base_dir, out, NULL, NULL, NULL);
++    (*func_ptr)((FriBidiChar *)in, len, base_dir, out, NULL, NULL, NULL);
+ 
+     return (wchar_t *) out;
+ }

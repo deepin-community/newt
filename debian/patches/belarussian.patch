@@ -4,10 +4,10 @@ Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=595938
 Last-Updaed: 2010-10-16
 Forwarded: no
 
-Index: newt-0.52.19/po/be.po
+Index: newt-0.52.24/po/be.po
 ===================================================================
 --- /dev/null
-+++ newt-0.52.19/po/be.po
++++ newt-0.52.24/po/be.po
 @@ -0,0 +1,33 @@
 +msgid ""
 +msgstr ""

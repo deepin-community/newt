@@ -4,10 +4,10 @@ Description: Bidirectional text support for NEWT.
 Last-Updated: 2015-12-30
 Forwarded: no
 
-Index: newt-0.52.19/button.c
+Index: newt-0.52.24/button.c
 ===================================================================
---- newt-0.52.19.orig/button.c
-+++ newt-0.52.19/button.c
+--- newt-0.52.24.orig/button.c
++++ newt-0.52.24/button.c
 @@ -113,7 +113,7 @@ static void buttonDrawIt(newtComponent c
  	    SLsmg_set_color(NEWT_COLORSET_ACTBUTTON);
  	newtGotorc(co->top+ pushed, co->left + 1 + pushed);
@@ -26,10 +26,10 @@ Index: newt-0.52.19/button.c
      SLsmg_write_char(' ');
  }
  
-Index: newt-0.52.19/checkbox.c
+Index: newt-0.52.24/checkbox.c
 ===================================================================
---- newt-0.52.19.orig/checkbox.c
-+++ newt-0.52.19/checkbox.c
+--- newt-0.52.24.orig/checkbox.c
++++ newt-0.52.24/checkbox.c
 @@ -210,7 +210,7 @@ static void cbDraw(newtComponent c) {
  	break;
      }
@@ -39,10 +39,10 @@ Index: newt-0.52.19/checkbox.c
  
      if (cb->hasFocus)
  	SLsmg_set_color(cb->active);
-Index: newt-0.52.19/checkboxtree.c
+Index: newt-0.52.24/checkboxtree.c
 ===================================================================
---- newt-0.52.19.orig/checkboxtree.c
-+++ newt-0.52.19/checkboxtree.c
+--- newt-0.52.24.orig/checkboxtree.c
++++ newt-0.52.24/checkboxtree.c
 @@ -492,7 +492,7 @@ static void ctDraw(newtComponent co) {
  	    currRow = co->top + i;
  	}
@@ -52,10 +52,10 @@ Index: newt-0.52.19/checkboxtree.c
  
  	item++;
  	i++;
-Index: newt-0.52.19/configure.ac
+Index: newt-0.52.24/configure.ac
 ===================================================================
---- newt-0.52.19.orig/configure.ac
-+++ newt-0.52.19/configure.ac
+--- newt-0.52.24.orig/configure.ac
++++ newt-0.52.24/configure.ac
 @@ -34,7 +34,10 @@ else
    AC_SUBST([GNU_LD])
  fi
@@ -68,7 +68,7 @@ Index: newt-0.52.19/configure.ac
  AC_CHECK_HEADER([slang.h], [], [
    old_CPPFLAGS=${CPPFLAGS}
    CPPFLAGS="${CPPFLAGS} -I/opt/local/include"
-@@ -109,6 +112,7 @@ else
+@@ -115,6 +118,7 @@ else
  fi
  AC_SUBST([WHIPTCLLIB])
  
@@ -76,10 +76,10 @@ Index: newt-0.52.19/configure.ac
  AC_ARG_WITH([gpm-support], [  --with-gpm-support      compile with GPM support])
  
  if test "x$with_gpm_support" = "xyes"; then
-Index: newt-0.52.19/entry.c
+Index: newt-0.52.24/entry.c
 ===================================================================
---- newt-0.52.19.orig/entry.c
-+++ newt-0.52.19/entry.c
+--- newt-0.52.24.orig/entry.c
++++ newt-0.52.24/entry.c
 @@ -233,12 +233,15 @@ static void entryDraw(newtComponent co)
  
      if (len <= co->width) {
@@ -97,10 +97,10 @@ Index: newt-0.52.19/entry.c
  	SLsmg_write_nstring(chptr, co->width);
  
      newtGotorc(co->top, co->left + wstrlen(en->buf+en->firstChar, en->cursorPosition - en->firstChar));
-Index: newt-0.52.19/label.c
+Index: newt-0.52.24/label.c
 ===================================================================
---- newt-0.52.19.orig/label.c
-+++ newt-0.52.19/label.c
+--- newt-0.52.24.orig/label.c
++++ newt-0.52.24/label.c
 @@ -80,7 +80,9 @@ static void labelDraw(newtComponent co)
      SLsmg_set_color(la->cs);
  
@@ -112,10 +112,10 @@ Index: newt-0.52.19/label.c
  }
  
  static void labelDestroy(newtComponent co) {
-Index: newt-0.52.19/listbox.c
+Index: newt-0.52.24/listbox.c
 ===================================================================
---- newt-0.52.19.orig/listbox.c
-+++ newt-0.52.19/listbox.c
+--- newt-0.52.24.orig/listbox.c
++++ newt-0.52.24/listbox.c
 @@ -530,7 +530,7 @@ static void listboxDraw(newtComponent co
  	else
  	    SLsmg_set_color(NEWT_COLORSET_LISTBOX);
@@ -125,11 +125,11 @@ Index: newt-0.52.19/listbox.c
  
  	if (li->flags & NEWT_FLAG_MULTIPLE) {
  	    newtGotorc(co->top + i + li->bdyAdjust, co->left + li->bdxAdjust);
-Index: newt-0.52.19/newt.c
+Index: newt-0.52.24/newt.c
 ===================================================================
---- newt-0.52.19.orig/newt.c
-+++ newt-0.52.19/newt.c
-@@ -18,6 +18,478 @@
+--- newt-0.52.24.orig/newt.c
++++ newt-0.52.24/newt.c
+@@ -19,6 +19,478 @@
  #include "newt.h"
  #include "newt_pr.h"
  
@@ -635,10 +635,10 @@ Index: newt-0.52.19/newt.c
  }
  
  int newtSetFlags(int oldFlags, int newFlags, enum newtFlagsSense sense) {
-Index: newt-0.52.19/newt.c-old
+Index: newt-0.52.24/newt.c-old
 ===================================================================
 --- /dev/null
-+++ newt-0.52.19/newt.c-old
++++ newt-0.52.24/newt.c-old
 @@ -0,0 +1,1438 @@
 +#include "config.h"
 +
@@ -2078,10 +2078,10 @@ Index: newt-0.52.19/newt.c-old
 +	SLsmg_touch_lines (0, SLtt_Screen_Rows - 1);
 +}
 +     
-Index: newt-0.52.19/newt_pr.h
+Index: newt-0.52.24/newt_pr.h
 ===================================================================
---- newt-0.52.19.orig/newt_pr.h
-+++ newt-0.52.19/newt_pr.h
+--- newt-0.52.24.orig/newt_pr.h
++++ newt-0.52.24/newt_pr.h
 @@ -84,6 +84,10 @@ struct eventResult newtDefaultEventHandl
  					   struct event ev);
  
@@ -2093,10 +2093,10 @@ Index: newt-0.52.19/newt_pr.h
  #define wstrlen(str,len) _newt_wstrlen((str),(len))
  void trim_string(char *title, int chrs);
  
-Index: newt-0.52.19/textbox.c
+Index: newt-0.52.24/textbox.c
 ===================================================================
---- newt-0.52.19.orig/textbox.c
-+++ newt-0.52.19/textbox.c
+--- newt-0.52.24.orig/textbox.c
++++ newt-0.52.24/textbox.c
 @@ -13,6 +13,7 @@ struct textbox {
      char ** lines;
      int numLines;
